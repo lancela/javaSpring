@@ -12,13 +12,71 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 统一管理 Spring 版本，避免各模块版本漂移 -->
+        <spring.version>6.2.17</spring.version>
+        <tomcat.version>10.1.52</tomcat.version>
+        <jackson.version>2.19.4</jackson.version>
     </properties>
+
     <dependencies>
+        <!-- Spring IoC 容器：Bean 注册、依赖注入、生命周期回调 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>6.2.11</version>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- Spring MVC：DispatcherServlet、@RestController、消息转换器 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- Spring 6 已改用 jakarta.annotation，且 spring-context 将其声明为 optional，
+             所以 @PostConstruct / @PreDestroy 必须自己显式引入 -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
+        <!-- 内嵌 Tomcat（Tomcat 10.x 实现 jakarta.servlet 6.0，与 Spring 6 匹配） -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${tomcat.version}</version>
+            <exclusions>
+                <!-- tomcat-annotations-api 仅是 jakarta.annotation 注解的副本，
+                     已由上面的 jakarta.annotation-api 提供，排除以避免重复 -->
+                <exclusion>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>tomcat-annotations-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- JSON 序列化/反序列化，@RequestBody / @ResponseBody 需要它 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!--  Spring 6.1+ 的 @PathVariable/@RequestParam 依赖方法参数名，
+                  必须让 javac 保留参数名（等价于 -parameters）  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.15.0</version>
+                <configuration>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
