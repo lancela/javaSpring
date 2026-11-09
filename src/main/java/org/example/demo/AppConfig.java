@@ -7,6 +7,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 //告诉 Spring 扫描 com.example.demo 包及其子包下所有带有 @Component（及其衍生注解）的类，并将它们注册为 Bean。
 // 如果不写 basePackages，默认扫描当前配置类所在包及其子包。
-@ComponentScan(basePackages = "org.example.demo")
+@ComponentScan(basePackages = "org.example.demo")  // 触发包扫描
 public class AppConfig {
 }
